@@ -1,15 +1,51 @@
 # CarbonTrack - PCF 대시보드
 
 제품 탄소 발자국(Product Carbon Footprint, PCF)을 시각화하는 인터랙티브 대시보드입니다.
-GHG Protocol Product Standard 기반으로 전과정(LCA) 데이터를 분석합니다.
+GHG Protocol Product Standard 기반으로 전과정(LCA) 탄소 배출량을 측정·분석·시뮬레이션합니다.
 
-## 작업 소요 시간
+> **대상 사용자**: 탄소 배출 관리 실무자 및 경영진
+> **기술 스택**: TypeScript, Next.js 15, Tailwind CSS, Nivo Charts, PostgreSQL (Optional)
 
-- **총 소요 시간**: 약 X시간 (기록 예정)
-- **시간이 많이 소요된 부분**:
-  - Mock 데이터 설계: 사실적인 배출계수와 활동 데이터를 만들기 위해 ecoinvent, IPCC 자료 참조
-  - Sankey 다이어그램: Nivo Sankey 데이터 구조를 PCF 전과정에 맞게 변환
-  - 경영자/실무자 뷰 분기: 동일 데이터의 다른 깊이의 시각화 설계
+---
+
+## 주요 기능
+
+### 1. 탄소 배출 대시보드 (`/dashboard`)
+- **KPI 카드**: 총 배출량, 제품당 평균, 전분기 대비 변화율, 평가 제품 수
+- **GHG Scope별 도넛 차트**: Scope 1(직접) / Scope 2(전력) / Scope 3(공급망) 비율
+- **분기별 추세 라인 차트**: 8분기 시계열, Scope별 분리 가능
+- **제품별 배출 순위**: 가로 바 차트
+- **경영자/실무자 뷰 토글**: 같은 데이터를 다른 깊이로 제공
+
+### 2. 제품 PCF 상세 (`/products/[id]`)
+- **Sankey 다이어그램**: 원소재 → 제조 → 운송 → 총배출 흐름 시각화
+- **Scope 파이 차트**: 제품별 Scope 분포
+- **활동 데이터 테이블**: 항목별 배출계수, 수량, CO₂e 상세
+- **시스템 경계 전환**: Cradle-to-Gate ↔ Cradle-to-Grave 토글
+
+### 3. 데이터 입력 (`/input`)
+- **CRUD**: 활동 데이터 추가/삭제 실동작
+- **탭 구성**: 원소재 | 에너지 | 운송
+- **배출계수 드롭다운**: 카테고리별 배출계수 선택
+- **실시간 PCF 프리뷰**: 데이터 변경 즉시 반영
+
+### 4. 제품 비교 (`/compare`)
+- **최대 4개 제품 동시 비교**
+- **전과정 단계별 그룹 바 차트**
+- **상세 비교 테이블**: Scope별, 단계별 수치 + 최대값 강조
+
+### 5. 감축 시뮬레이션 (`/simulation`)
+- **4가지 시나리오**: 재생에너지 전환, 재생 원소재 확대, 운송 최적화, 에너지 효율 개선
+- **복수 시나리오 조합**: 누적 감축 효과 계산
+- **현재 vs 시뮬레이션 비교 차트**
+- **항목별 변화 상세 테이블** (변화량 + 변화율)
+
+### 6. 반응형 디자인
+- 모바일 Sidebar (햄버거 메뉴 + 오버레이)
+- 로딩 스켈레톤 애니메이션
+- 404 페이지
+
+---
 
 ## 빠른 시작
 
@@ -46,47 +82,62 @@ npm run dev
 
 DB 관리: `npm run db:studio` (Prisma Studio GUI)
 
+---
+
 ## 기술 스택
 
 | 영역 | 선택 | 이유 |
 |------|------|------|
-| Framework | Next.js 15 (App Router) | 과제 요구사항. SSR/RSC 활용, 파일 기반 라우팅 |
-| Language | TypeScript | 과제 요구사항. 도메인 타입의 컴파일 타임 검증 |
-| UI | Tailwind CSS + shadcn/ui | 빠른 개발 속도, 일관된 디자인 시스템 |
-| Charts | Nivo (Sankey, Bar, Pie, Line) | Sankey 다이어그램 네이티브 지원, React 선언적 API |
+| Framework | Next.js 15 (App Router) | SSR/RSC 활용, 파일 기반 라우팅 |
+| Language | TypeScript | 도메인 타입의 컴파일 타임 검증 |
+| UI | Tailwind CSS + shadcn/ui | 빠른 개발, 일관된 디자인 시스템 |
+| Charts | Nivo (Sankey, Bar, Pie, Line) | Sankey 네이티브 지원, React 선언적 API |
 | Icons | lucide-react | shadcn/ui 생태계 호환 |
-| DB | PostgreSQL 16 + Prisma 7 (Optional) | Repository 패턴으로 In-memory/DB 전환 가능 |
-| Data | In-memory mock data (기본) | DB 없이 즉시 실행. USE_DB=true로 Postgres 전환 |
+| DB | PostgreSQL 16 + Prisma 7 | Repository 패턴으로 In-memory/DB 전환 가능 |
+
+---
 
 ## 프로젝트 구조
 
 ```
 src/
-├── app/                    # Next.js App Router 페이지
-│   ├── dashboard/          # 탄소 배출 대시보드 (메인)
-│   ├── products/           # 제품 목록 + 상세 (Sankey)
-│   ├── input/              # 활동 데이터 입력/관리
-│   ├── compare/            # 제품간 비교 분석
-│   └── api/                # REST API 엔드포인트
+├── app/
+│   ├── dashboard/              # 탄소 배출 대시보드
+│   ├── products/               # 제품 목록 + [id] 상세
+│   ├── input/                  # 활동 데이터 입력 (CRUD)
+│   ├── compare/                # 제품 비교
+│   ├── simulation/             # 감축 시뮬레이션
+│   └── api/                    # REST API
+│       ├── products/           # 제품 CRUD
+│       ├── pcf/                # PCF 계산
+│       ├── emission-factors/   # 배출계수 조회
+│       ├── activity-data/      # 활동 데이터 CRUD
+│       └── dashboard/          # 대시보드 KPI + 추세
 ├── components/
-│   ├── layout/             # Sidebar, Header, ViewToggle
-│   ├── dashboard/          # KpiCard, 차트 컴포넌트
-│   ├── pcf/                # Sankey, ScopePie, PcfSummary
-│   └── ui/                 # shadcn/ui 기반 공통 컴포넌트
+│   ├── layout/                 # Sidebar, Header, ViewToggle
+│   ├── dashboard/              # KpiCard, EmissionsByScope, TrendChart, TopEmitters
+│   ├── pcf/                    # LifecycleSankey, ScopePieChart, PcfSummaryCard
+│   └── ui/                    # shadcn/ui 공통 컴포넌트
 ├── lib/
-│   ├── types/              # 도메인 타입 (Product, Emission, PCF)
-│   ├── calculations/       # PCF 계산 엔진
-│   ├── data/               # Mock 데이터
-│   └── constants.ts        # 라벨, 색상, 포맷터
-└── contexts/               # ViewMode Context (경영자/실무자)
+│   ├── types/                  # Product, EmissionFactor, ActivityData, PcfResult
+│   ├── calculations/           # PCF 계산 엔진 (순수 함수)
+│   ├── data/                   # Mock 데이터 + Repository 추상화
+│   ├── prisma.ts               # Prisma 클라이언트
+│   └── constants.ts            # 라벨, 색상, 포맷터
+├── contexts/                   # ViewMode Context (경영자/실무자)
+└── stores/                     # 클라이언트 상태 관리
 ```
+
+---
 
 ## PCF 도메인 모델
 
 ### GHG Protocol Scopes
-- **Scope 1 (직접 배출)**: 자사 시설에서의 화석연료 연소, 공정 배출
-- **Scope 2 (간접 배출)**: 구매 전력, 스팀 등 에너지 사용에 의한 배출
-- **Scope 3 (기타 간접)**: 공급망(원소재 채굴), 운송, 사용 단계, 폐기 등
+| Scope | 설명 | 예시 |
+|-------|------|------|
+| Scope 1 | 직접 배출 | 자사 공장 연소, 공정 배출 |
+| Scope 2 | 간접 배출 | 구매 전력, 스팀 |
+| Scope 3 | 기타 간접 | 원소재 채굴, 운송, 사용, 폐기 |
 
 ### 전과정 평가 (LCA) 단계
 ```
@@ -94,7 +145,7 @@ src/
 ```
 
 ### 시스템 경계
-- **Cradle-to-Gate**: 원소재 ~ 운송 (제조사 관점)
+- **Cradle-to-Gate**: 원소재 ~ 공장 출하 (제조사 관점)
 - **Cradle-to-Grave**: 원소재 ~ 폐기 (전체 수명주기)
 
 ### 계산 공식
@@ -103,35 +154,52 @@ CO₂e = 활동 데이터(수량) × 배출계수(kgCO₂e/단위)
 제품 PCF = Σ (각 활동 항목의 CO₂e)
 ```
 
+### Mock 데이터 (5개 제품)
+| 제품 | 기능단위 | 총 CO₂e | 지배적 단계 | 지배적 Scope |
+|------|----------|---------|-------------|--------------|
+| 열연강판 | 1 ton | ~1,855 kg | 제조 (고로) | Scope 1 |
+| 노트북 | 1 unit | ~350 kg | 원소재 (반도체) | Scope 3 |
+| 골판지 박스 | 1,000개 | ~480 kg | 원소재 (펄프) | Scope 3 |
+| 리튬이온 배터리셀 | 1 kWh | ~50 kg | 제조 (전극) | Scope 2 |
+| PET 병 | 1,000개 | ~85 kg | 원소재 (석유) | Scope 3 |
+
+배출계수 출처: ecoinvent 3.9, IPCC 2021, 환경부 2023, DEFRA 2023
+
+---
+
 ## 설계 결정
 
-### 1. In-memory Data vs Database
-**선택: In-memory** — `lib/data/` 모듈에 mock 데이터 저장. API 라우트가 이 모듈을 호출하므로, Prisma/Postgres로 전환 시 data 레이어만 교체하면 됨.
-
-**Trade-off**: 데이터 영속성은 없지만, 2-3일 타임박스에서 UI/UX와 도메인 로직에 집중 가능.
+### 1. Repository 패턴 (In-memory ↔ Postgres)
+`lib/data/repository.ts`에서 `USE_DB` 환경변수로 데이터 소스 전환. 계산 엔진(`pcf-engine.ts`)은 DB 의존 없이 순수 함수로 유지.
 
 ### 2. 경영자 vs 실무자 뷰
-**선택: Context 기반 조건 렌더링** — 별도 페이지가 아닌 `ViewModeContext`로 동일 페이지에서 뷰 전환.
-
-- 경영자: KPI, 추세, 고수준 차트 (핵심 지표 중심)
-- 실무자: + Lifecycle 단계별 분석, Scope 상세, 드릴다운
-
-**이유**: 두 사용자가 같은 데이터를 다른 깊이로 볼 필요가 있어, 별도 페이지보다 토글이 UX 관점에서 자연스러움.
+`ViewModeContext` 기반 조건 렌더링. 경영자는 KPI + 추세, 실무자는 + Lifecycle 상세 + Scope 분석. 별도 페이지 대신 토글 방식이 같은 데이터의 다른 깊이를 자연스럽게 제공.
 
 ### 3. Sankey 다이어그램
-**선택: Nivo @nivo/sankey** — PCF 전과정의 에너지/물질 흐름을 직관적으로 시각화.
+PCF 전과정 흐름을 3단계로 시각화: 입력 소스 → 전과정 단계 → 총 배출량. 탄소 회계에서 가장 직관적인 시각화 방식.
 
-입력 소스(철광석, 전력 등) → 전과정 단계(원소재, 제조 등) → 총 배출량으로 흐르는 3단계 Sankey.
-
-**Trade-off**: Sankey는 데이터 변환이 복잡하지만, 탄소 회계에서 가장 직관적인 시각화.
-
-### 4. 배출계수 데이터
-ecoinvent 3.9, IPCC 2021, 환경부 2023, DEFRA 2023 기반의 사실적인 값 사용.
-재활용 크레딧(음수 값)도 포함하여 순환경제 효과 반영.
+### 4. 감축 시뮬레이션
+배출계수에 감축 비율을 곱하는 방식. 복수 시나리오 조합 시 비율을 누적 곱하여 현실적 감축 효과 반영.
 
 ### 5. API 설계
-RESTful API로 클라이언트-서버 분리. 계산 로직은 서버 사이드(`/api/pcf/calculate`)에서 실행.
-확장 시 외부 시스템과의 연동 용이.
+RESTful API로 클라이언트-서버 분리. 계산 로직은 서버 사이드에서 실행하여 일관성 보장.
+
+---
+
+## API 엔드포인트
+
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/api/products` | 제품 목록 (카테고리 필터, CO₂e 정렬) |
+| GET | `/api/products/[id]` | 제품 상세 + PCF 결과 |
+| POST | `/api/pcf/calculate` | PCF 계산 실행 |
+| GET | `/api/pcf/results/[id]` | 계산 결과 조회 |
+| GET | `/api/emission-factors` | 배출계수 목록 |
+| GET/POST/DELETE | `/api/activity-data` | 활동 데이터 CRUD |
+| GET | `/api/dashboard/summary` | 대시보드 KPI |
+| GET | `/api/dashboard/trends` | 분기별 시계열 |
+
+---
 
 ## AI 활용 투명성
 
@@ -139,28 +207,23 @@ RESTful API로 클라이언트-서버 분리. 계산 로직은 서버 사이드(
 - **활용 범위**:
   - 프로젝트 구조 설계 및 구현 계획 수립
   - TypeScript 타입 정의 및 컴포넌트 코드 작성
-  - Mock 데이터 생성 (배출계수 값은 공개 자료 기반)
+  - Mock 데이터 생성 (배출계수 값은 공개 자료 참조)
   - README 및 문서 작성
 - **직접 판단한 부분**:
-  - PCF 도메인 모델 설계 (어떤 타입이 필요한지, 관계 구조)
+  - PCF 도메인 모델 설계 (타입 구조, 관계)
   - 경영자/실무자 뷰 분기 전략
   - Sankey 다이어그램 데이터 변환 로직
   - 배출계수 값의 현실성 검증
-  - UX 흐름 결정 (어떤 정보를 어디에 배치할지)
+  - UX 흐름 (정보 배치, 인터랙션 설계)
+  - 감축 시뮬레이션 시나리오 설계
 
-## 주요 기능
-
-1. **탄소 배출 대시보드**: KPI, Scope 분포, 분기별 추세, 제품 순위, 경영자/실무자 뷰
-2. **제품 PCF 상세**: Sankey 전과정 흐름, 활동 데이터 테이블, Cradle-to-gate/grave 전환
-3. **데이터 입력 (CRUD)**: 활동 데이터 추가/삭제, 배출계수 드롭다운, 실시간 PCF 프리뷰
-4. **제품 비교**: 최대 4개 제품 비교 차트 및 상세 테이블
-5. **감축 시뮬레이션**: 4가지 감축 시나리오 (재생에너지, 재생 원소재, 운송 최적화, 에너지 효율)
-6. **반응형 디자인**: 모바일 Sidebar collapse, 로딩 스켈레톤, 404 페이지
+---
 
 ## 향후 확장 가능 사항
 
-- Prisma + PostgreSQL 데이터베이스 연동
 - 사용자 인증 및 멀티테넌트
 - CSV/Excel 대량 데이터 업로드
-- PDF 보고서 생성
+- PDF 보고서 생성 (ISO 14067 형식)
 - 실제 배출계수 DB 연동 (ecoinvent API)
+- 감축 목표 설정 및 진척 추적
+- 공급업체별 Scope 3 분석
