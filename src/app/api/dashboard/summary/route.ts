@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
-import { products } from "@/lib/data";
+import { findAllProducts } from "@/lib/data/repository";
 import { trendData } from "@/lib/data";
 import { calculateAllPcf } from "@/lib/calculations";
 import type { DashboardSummary } from "@/lib/types";
 import type { GhgScope, LifecycleStage } from "@/lib/types";
 
 export async function GET() {
+  const products = await findAllProducts();
   const allResults = calculateAllPcf(products, "cradle-to-gate");
 
   const totalCo2e = allResults.reduce((sum, r) => sum + r.totalCo2e, 0);
   const avgCo2ePerProduct = totalCo2e / allResults.length;
 
-  // Scope 집계
   const scopes: GhgScope[] = ["scope1", "scope2", "scope3"];
   const scopeBreakdown = scopes.reduce(
     (acc, scope) => {
@@ -21,7 +21,6 @@ export async function GET() {
     {} as Record<GhgScope, number>
   );
 
-  // Lifecycle Stage 집계
   const stages: LifecycleStage[] = [
     "raw_material",
     "manufacturing",
@@ -40,10 +39,8 @@ export async function GET() {
     {} as Record<LifecycleStage, number>
   );
 
-  // Top / Lowest emitter
   const sorted = [...allResults].sort((a, b) => b.totalCo2e - a.totalCo2e);
 
-  // 전분기 대비 변화율
   const latestQuarter = trendData[trendData.length - 1];
   const previousQuarter = trendData[trendData.length - 2];
   const quarterOverQuarterChange =

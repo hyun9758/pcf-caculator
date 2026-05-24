@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// 제품
+model Product {
+  id             String   @id @default(cuid())
+  name           String
+  description    String
+  category       String   // steel, electronics, packaging, chemicals, automotive_parts
+  functionalUnit String   @map("functional_unit")
+  weight         Float    // kg
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  activityData ActivityData[]
+
+  @@map("products")
+}
+
+/// 배출계수
+model EmissionFactor {
+  id          String @id @default(cuid())
+  name        String
+  nameKo      String @map("name_ko")
+  category    String // material, energy, fuel, transport, waste
+  unit        String // kg, kWh, tkm, L, m3, GJ
+  co2ePerUnit Float  @map("co2e_per_unit") // kgCO2e per unit
+  source      String // 출처 (IPCC 2021, ecoinvent 3.9 등)
+  region      String // KR, CN, Global 등
+  scope       String // scope1, scope2, scope3
+
+  activityData ActivityData[]
+
+  @@map("emission_factors")
+}
+
+/// 활동 데이터 (제품별 투입/배출 항목)
+model ActivityData {
+  id              String @id @default(cuid())
+  productId       String @map("product_id")
+  lifecycleStage  String @map("lifecycle_stage") // raw_material, manufacturing, transportation, use, end_of_life
+  emissionFactorId String @map("emission_factor_id")
+  description     String
+  descriptionKo   String @map("description_ko")
+  quantity        Float
+  unit            String
+
+  product        Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  emissionFactor EmissionFactor @relation(fields: [emissionFactorId], references: [id])
+
+  @@map("activity_data")
+}

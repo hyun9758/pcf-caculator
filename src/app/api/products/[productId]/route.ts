@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getProduct } from "@/lib/data";
-import { getActivityDataByProduct } from "@/lib/data";
+import { findProductById, findActivityDataByProduct } from "@/lib/data/repository";
 import { calculatePcf } from "@/lib/calculations";
 
 export async function GET(
@@ -8,7 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ productId: string }> }
 ) {
   const { productId } = await params;
-  const product = getProduct(productId);
+  const product = await findProductById(productId);
 
   if (!product) {
     return NextResponse.json(
@@ -17,7 +16,7 @@ export async function GET(
     );
   }
 
-  const activityData = getActivityDataByProduct(productId);
+  const activityData = await findActivityDataByProduct(productId);
   const pcfResult = calculatePcf(product, "cradle-to-gate");
   const pcfResultGrave = calculatePcf(product, "cradle-to-grave");
 

@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pcf-postgres
+    environment:
+      POSTGRES_USER: pcf
+      POSTGRES_PASSWORD: pcf1234
+      POSTGRES_DB: pcf_calculator
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

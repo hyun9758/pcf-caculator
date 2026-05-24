@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { products } from "@/lib/data";
+import { findAllProducts } from "@/lib/data/repository";
 import { calculatePcf } from "@/lib/calculations";
 
 export async function GET(request: Request) {
@@ -7,14 +7,12 @@ export async function GET(request: Request) {
   const category = searchParams.get("category");
   const sort = searchParams.get("sort");
 
-  let result = [...products];
+  let result = await findAllProducts();
 
-  // 카테고리 필터
   if (category) {
     result = result.filter((p) => p.category === category);
   }
 
-  // PCF 결과 포함
   const withPcf = result.map((product) => {
     const pcfResult = calculatePcf(product, "cradle-to-gate");
     return {
@@ -27,7 +25,6 @@ export async function GET(request: Request) {
     };
   });
 
-  // 정렬
   if (sort === "co2e_asc") {
     withPcf.sort((a, b) => a.pcfSummary.totalCo2e - b.pcfSummary.totalCo2e);
   } else if (sort === "co2e_desc") {
