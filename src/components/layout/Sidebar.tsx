@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -9,6 +10,8 @@ import {
   GitCompareArrows,
   FlaskConical,
   Leaf,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,15 +25,24 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r bg-white">
+  const navContent = (
+    <>
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2 border-b px-6">
-        <Leaf className="h-6 w-6 text-green-600" />
-        <span className="text-lg font-bold text-gray-900">
-          Carbon<span className="text-green-600">Track</span>
-        </span>
+      <div className="flex h-16 items-center justify-between border-b px-6">
+        <div className="flex items-center gap-2">
+          <Leaf className="h-6 w-6 text-green-600" />
+          <span className="text-lg font-bold text-gray-900">
+            Carbon<span className="text-green-600">Track</span>
+          </span>
+        </div>
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="lg:hidden rounded-lg p-1 text-gray-400 hover:text-gray-600"
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
       {/* Navigation */}
@@ -42,6 +54,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setMobileOpen(false)}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
@@ -64,6 +77,41 @@ export function Sidebar() {
           GHG Protocol 기반
         </p>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="fixed top-4 left-4 z-50 rounded-lg border bg-white p-2 shadow-sm lg:hidden"
+      >
+        <Menu className="h-5 w-5 text-gray-600" />
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile sidebar */}
+      <aside
+        className={cn(
+          "fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r bg-white transition-transform lg:hidden",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {navContent}
+      </aside>
+
+      {/* Desktop sidebar */}
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r bg-white lg:flex">
+        {navContent}
+      </aside>
+    </>
   );
 }
