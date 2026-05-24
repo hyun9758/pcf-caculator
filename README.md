@@ -13,18 +13,38 @@ GHG Protocol Product Standard 기반으로 전과정(LCA) 데이터를 분석합
 
 ## 빠른 시작
 
+### A. In-memory 모드 (DB 없이 바로 실행)
+
 ```bash
-# 의존성 설치
 npm install
-
-# 개발 서버 실행
 npm run dev
-
-# 빌드
-npm run build
 ```
 
 http://localhost:3000 접속
+
+### B. PostgreSQL 모드 (Docker)
+
+```bash
+# 1. Postgres 컨테이너 실행
+docker compose up -d
+
+# 2. 환경변수 설정
+cp .env.example .env
+# .env에 USE_DB=true 추가
+
+# 3. 의존성 설치 + Prisma 클라이언트 생성
+npm install
+npx prisma generate
+
+# 4. DB 마이그레이션 + 시드 데이터 투입
+npx prisma migrate dev --name init
+npm run db:seed
+
+# 5. 개발 서버 실행
+npm run dev
+```
+
+DB 관리: `npm run db:studio` (Prisma Studio GUI)
 
 ## 기술 스택
 
@@ -35,7 +55,8 @@ http://localhost:3000 접속
 | UI | Tailwind CSS + shadcn/ui | 빠른 개발 속도, 일관된 디자인 시스템 |
 | Charts | Nivo (Sankey, Bar, Pie, Line) | Sankey 다이어그램 네이티브 지원, React 선언적 API |
 | Icons | lucide-react | shadcn/ui 생태계 호환 |
-| Data | In-memory mock data | 2-3일 타임박스에 최적. API 레이어 추상화로 DB 전환 용이 |
+| DB | PostgreSQL 16 + Prisma 7 (Optional) | Repository 패턴으로 In-memory/DB 전환 가능 |
+| Data | In-memory mock data (기본) | DB 없이 즉시 실행. USE_DB=true로 Postgres 전환 |
 
 ## 프로젝트 구조
 
