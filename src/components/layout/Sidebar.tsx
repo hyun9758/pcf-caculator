@@ -7,6 +7,7 @@ import {
   Package,
   FileInput,
   GitCompareArrows,
+  FlaskConical,
   Leaf,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,7 @@ const navItems = [
   { href: "/products", label: "제품 관리", icon: Package },
   { href: "/input", label: "데이터 입력", icon: FileInput },
   { href: "/compare", label: "제품 비교", icon: GitCompareArrows },
+  { href: "/simulation", label: "감축 시뮬레이션", icon: FlaskConical },
 ];
 
 export function Sidebar() {
