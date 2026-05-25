@@ -3,9 +3,9 @@
 제품 탄소 발자국(Product Carbon Footprint, PCF)을 시각화하는 인터랙티브 대시보드입니다.
 GHG Protocol Product Standard 기반으로 전과정(LCA) 탄소 배출량을 측정·분석·시뮬레이션합니다.
 
-> **배포 URL**: https://pcf-caculator.vercel.app
-> **대상 사용자**: 탄소 배출 관리 실무자 및 경영진
-> **기술 스택**: TypeScript, Next.js 15, Tailwind CSS, Nivo Charts, PostgreSQL (Optional)
+> **배포 URL**: https://pcf-caculator.vercel.app </br>
+> **대상 사용자**: 탄소 배출 관리 실무자 및 경영진 </br> 
+> **기술 스택**: TypeScript, Next.js 15, Tailwind CSS, Nivo Charts, PostgreSQL (Optional) </br>
 
 ---
 
