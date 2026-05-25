@@ -1,9 +1,16 @@
 import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
 import { products } from "../src/lib/data/products";
 import { emissionFactors } from "../src/lib/data/emission-factors";
 import { activityData } from "../src/lib/data/activity-data";
 
-const prisma = new PrismaClient();
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter }) as unknown as InstanceType<typeof PrismaClient>;
 
 async function main() {
   console.log("🌱 Seeding database...");
@@ -75,4 +82,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });
