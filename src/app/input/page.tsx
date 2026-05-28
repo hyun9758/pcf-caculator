@@ -24,6 +24,7 @@ import {
 import { ACTIVITY_TYPE_TO_STAGE } from "@/lib/types";
 import type { LifecycleStage, ActivityData, ActivityType } from "@/lib/types";
 import { Plus, Trash2, X, Check, Zap, FlaskConical, Truck, AlertCircle } from "lucide-react";
+import { ExcelImport } from "@/components/input/ExcelImport";
 
 interface FormErrors {
   date?: string;
@@ -410,6 +411,15 @@ export default function InputPage() {
             </Card>
           </div>
         </div>
+        {/* Excel Import */}
+        <ExcelImport
+          productId={selectedProductId}
+          onImport={(data) => {
+            setLocalActivityData((prev) => [...prev, ...data]);
+            setSuccessMessage(`Excel에서 ${data.length}건 임포트 완료`);
+            setTimeout(() => setSuccessMessage(""), 5000);
+          }}
+        />
       </div>
     </div>
   );
