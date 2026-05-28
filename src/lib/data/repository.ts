@@ -83,6 +83,8 @@ export async function createActivityData(
     const row = await prisma.activityData.create({
       data: {
         productId: data.productId,
+        date: data.date,
+        activityType: data.activityType,
         lifecycleStage: data.lifecycleStage,
         emissionFactorId: data.emissionFactorId,
         description: data.description,
@@ -93,7 +95,6 @@ export async function createActivityData(
     });
     return mapActivityData(row);
   }
-  // In-memory: 반환만 (실제 저장은 클라이언트 상태에서 관리)
   return {
     id: `ad-mem-${Date.now()}`,
     ...data,
@@ -141,6 +142,9 @@ function mapEmissionFactor(row: {
   source: string;
   region: string;
   scope: string;
+  version?: number | null;
+  validFrom?: string | null;
+  validTo?: string | null;
 }): EmissionFactor {
   return {
     id: row.id,
@@ -152,12 +156,17 @@ function mapEmissionFactor(row: {
     source: row.source,
     region: row.region,
     scope: row.scope as EmissionFactor["scope"],
+    version: row.version ?? undefined,
+    validFrom: row.validFrom ?? undefined,
+    validTo: row.validTo ?? undefined,
   };
 }
 
 function mapActivityData(row: {
   id: string;
   productId: string;
+  date?: string | null;
+  activityType?: string | null;
   lifecycleStage: string;
   emissionFactorId: string;
   description: string;
@@ -168,6 +177,8 @@ function mapActivityData(row: {
   return {
     id: row.id,
     productId: row.productId,
+    date: row.date || "",
+    activityType: (row.activityType || "전기") as ActivityData["activityType"],
     lifecycleStage: row.lifecycleStage as ActivityData["lifecycleStage"],
     emissionFactorId: row.emissionFactorId,
     description: row.description,

@@ -1,4 +1,4 @@
-import type { Product, ActivityData, EmissionFactor, PcfResult, PcfLineItem, PcfBoundary } from "../types";
+import type { Product, PcfResult, PcfLineItem, PcfBoundary } from "../types";
 import type { LifecycleStage, GhgScope } from "../types";
 import { CRADLE_TO_GATE_STAGES, LIFECYCLE_STAGE_ORDER } from "../constants";
 import { getEmissionFactor } from "../data/emission-factors";
@@ -9,10 +9,6 @@ import { getActivityDataByProduct } from "../data/activity-data";
  *
  * 계산 공식: CO2e = Activity Data (수량) × Emission Factor (배출계수)
  * 제품 PCF = Σ (각 활동 데이터의 CO2e)
- *
- * 경계 설정:
- * - cradle-to-gate: 원소재 + 제조 + 운송 (게이트까지)
- * - cradle-to-grave: 전 과정 (원소재 ~ 폐기/재활용)
  */
 export function calculatePcf(
   product: Product,
@@ -20,7 +16,6 @@ export function calculatePcf(
 ): PcfResult {
   const allActivityData = getActivityDataByProduct(product.id);
 
-  // 경계에 따라 활동 데이터 필터링
   const filteredData =
     boundary === "cradle-to-gate"
       ? allActivityData.filter((ad) =>
@@ -28,7 +23,6 @@ export function calculatePcf(
         )
       : allActivityData;
 
-  // 각 활동 데이터에 대해 CO2e 계산
   const lineItems: PcfLineItem[] = filteredData
     .map((ad) => {
       const ef = getEmissionFactor(ad.emissionFactorId);
@@ -47,11 +41,12 @@ export function calculatePcf(
         emissionFactorValue: ef.co2ePerUnit,
         emissionFactorName: ef.nameKo,
         co2e,
+        date: ad.date,
+        activityType: ad.activityType,
       };
     })
-    .filter((item): item is PcfLineItem => item !== null);
+    .filter((item): item is PcfLineItem & { date: string; activityType: string } => item !== null);
 
-  // Lifecycle Stage별 합산
   const byLifecycleStage = LIFECYCLE_STAGE_ORDER.reduce(
     (acc, stage) => {
       acc[stage] = lineItems
@@ -62,7 +57,6 @@ export function calculatePcf(
     {} as Record<LifecycleStage, number>
   );
 
-  // Scope별 합산
   const scopes: GhgScope[] = ["scope1", "scope2", "scope3"];
   const byScope = scopes.reduce(
     (acc, scope) => {
@@ -90,9 +84,6 @@ export function calculatePcf(
   };
 }
 
-/**
- * 모든 제품의 PCF 결과를 한번에 계산
- */
 export function calculateAllPcf(
   products: Product[],
   boundary: PcfBoundary = "cradle-to-gate"

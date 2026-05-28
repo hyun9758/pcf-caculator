@@ -2,59 +2,15 @@ import type { Product } from "../types";
 
 export const products: Product[] = [
   {
-    id: "prod-steel-coil",
-    name: "열연강판 (Hot-Rolled Steel Coil)",
+    id: "prod-ct045",
+    name: "컴퓨터 화면 (CT-045)",
     description:
-      "고로(BF-BOF) 공정으로 생산되는 열연강판. 건설, 자동차, 조선 산업의 기초 소재.",
-    category: "steel",
-    functionalUnit: "1 ton",
-    weight: 1000,
-    createdAt: "2024-01-15T09:00:00Z",
-    updatedAt: "2025-03-10T14:30:00Z",
-  },
-  {
-    id: "prod-laptop",
-    name: "노트북 컴퓨터 (Laptop)",
-    description:
-      "14인치 비즈니스 노트북. 반도체, LCD 패널, 배터리, PCB 등 다양한 부품 포함.",
+      "컴퓨터 모니터 제품. 전기, 플라스틱 원소재, 트럭 운송 데이터를 기반으로 PCF를 산출합니다.",
     category: "electronics",
     functionalUnit: "1 unit",
-    weight: 1.8,
-    createdAt: "2024-02-01T09:00:00Z",
-    updatedAt: "2025-04-05T10:00:00Z",
-  },
-  {
-    id: "prod-cardboard-box",
-    name: "골판지 박스 (Corrugated Box)",
-    description:
-      "B골 골판지 택배 박스 (400×300×200mm). 재생 펄프 70% + 원목 펄프 30% 혼합.",
-    category: "packaging",
-    functionalUnit: "1,000 units",
-    weight: 350,
-    createdAt: "2024-03-10T09:00:00Z",
-    updatedAt: "2025-02-20T11:00:00Z",
-  },
-  {
-    id: "prod-battery-cell",
-    name: "리튬이온 배터리셀 (Li-ion Cell)",
-    description:
-      "NCM811 양극재 기반 원통형 배터리셀. 전기차 및 ESS용.",
-    category: "electronics",
-    functionalUnit: "1 kWh capacity",
-    weight: 6.5,
-    createdAt: "2024-04-20T09:00:00Z",
-    updatedAt: "2025-05-01T15:00:00Z",
-  },
-  {
-    id: "prod-pet-bottle",
-    name: "PET 음료병 (PET Bottle)",
-    description:
-      "500mL 일회용 음료 용기. 석유 기반 PET 수지 사용, 캡 및 라벨 포함.",
-    category: "packaging",
-    functionalUnit: "1,000 units",
-    weight: 18,
-    createdAt: "2024-05-05T09:00:00Z",
-    updatedAt: "2025-04-15T09:30:00Z",
+    weight: 5.0,
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-08-01T00:00:00Z",
   },
 ];
 

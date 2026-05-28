@@ -15,12 +15,10 @@ const prisma = new PrismaClient({ adapter }) as unknown as InstanceType<typeof P
 async function main() {
   console.log("🌱 Seeding database...");
 
-  // 기존 데이터 삭제 (순서 중요: FK 의존성)
   await prisma.activityData.deleteMany();
   await prisma.emissionFactor.deleteMany();
   await prisma.product.deleteMany();
 
-  // 배출계수 투입
   console.log(`  → ${emissionFactors.length}개 배출계수 투입`);
   for (const ef of emissionFactors) {
     await prisma.emissionFactor.create({
@@ -34,11 +32,13 @@ async function main() {
         source: ef.source,
         region: ef.region,
         scope: ef.scope,
+        version: ef.version ?? 1,
+        validFrom: ef.validFrom ?? null,
+        validTo: ef.validTo ?? null,
       },
     });
   }
 
-  // 제품 투입
   console.log(`  → ${products.length}개 제품 투입`);
   for (const product of products) {
     await prisma.product.create({
@@ -55,13 +55,14 @@ async function main() {
     });
   }
 
-  // 활동 데이터 투입
   console.log(`  → ${activityData.length}개 활동 데이터 투입`);
   for (const ad of activityData) {
     await prisma.activityData.create({
       data: {
         id: ad.id,
         productId: ad.productId,
+        date: ad.date,
+        activityType: ad.activityType,
         lifecycleStage: ad.lifecycleStage,
         emissionFactorId: ad.emissionFactorId,
         description: ad.description,

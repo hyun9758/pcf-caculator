@@ -1,4 +1,4 @@
-import type { LifecycleStage, GhgScope } from "./emission";
+import type { LifecycleStage, GhgScope, ActivityType } from "./emission";
 
 /** PCF 시스템 경계 */
 export type PcfBoundary = "cradle-to-gate" | "cradle-to-grave";
@@ -15,6 +15,8 @@ export interface PcfLineItem {
   emissionFactorValue: number; // kgCO2e/unit
   emissionFactorName: string;
   co2e: number; // quantity × emissionFactorValue
+  date?: string;
+  activityType?: ActivityType;
 }
 
 /** PCF 계산 결과 */

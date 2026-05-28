@@ -20,10 +20,13 @@ import type { ProductCategory, GhgScope, LifecycleStage } from "@/lib/types";
 import { GitCompareArrows } from "lucide-react";
 
 export default function ComparePage() {
-  const [selectedIds, setSelectedIds] = useState<string[]>([
-    products[0].id,
-    products[1].id,
-  ]);
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    products.length >= 2
+      ? [products[0].id, products[1].id]
+      : products.length === 1
+        ? [products[0].id]
+        : []
+  );
 
   const toggleProduct = (id: string) => {
     setSelectedIds((prev) => {

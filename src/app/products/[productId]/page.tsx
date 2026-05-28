@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/layout";
-import { PcfSummaryCard, LifecycleSankey, ScopePieChart } from "@/components/pcf";
+import { PcfSummaryCard, LifecycleSankey, ScopePieChart, AiAnalysis } from "@/components/pcf";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -234,6 +234,9 @@ export default function ProductDetailPage() {
             </Card>
           </div>
         </div>
+
+        {/* AI Analysis */}
+        <AiAnalysis pcfResult={pcfResult} />
       </div>
     </div>
   );
